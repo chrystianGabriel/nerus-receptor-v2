@@ -5,11 +5,14 @@
 </template>
 <script>
 import { mapActions } from 'vuex';
+import AuthService from './services/authService';
 
 export default {
   name: 'App',
   mounted() {
-    this.carreguePlaylist('3282703');
+    const codigo = '3282703';
+    AuthService.auth(codigo);
+    this.carreguePlaylist(codigo);
   },
   methods: {
     ...mapActions({ carreguePlaylist: 'playlist/carreguePlaylist' }),

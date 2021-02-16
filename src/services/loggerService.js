@@ -6,6 +6,11 @@ class Logger {
   constructor() {
     this.log = {};
   }
+  
+  classe(classe) {
+    this.log['classe'] = classe;
+    return this;
+  }
 
   metodo(metodo) {
     this.log['metodo'] = metodo;
@@ -28,8 +33,9 @@ class Logger {
       loggerApi.post('/error', this.log, {
         auth: AuthService.getUserToken(),
       })
-        .then(() => {
-          resolve();
+        .then((res) => {
+          this.log = {};
+          resolve(res.data.sucesso);
         })
         .catch((e) => reject(e));
     });
@@ -37,9 +43,12 @@ class Logger {
 
   warn() {
     return new Promise((resolve, reject) => {
-      loggerApi.post(`${this.URL_BASE}/warn`, this.log)
-        .then(() => {
-          resolve();
+      loggerApi.post(`/warn`, this.log, {
+        auth: AuthService.getUserToken(),
+      })
+        .then((res) => {
+          this.log = {};
+          resolve(res.data.sucesso);
         })
         .catch((e) => reject(e));
     });
@@ -47,9 +56,15 @@ class Logger {
 
   info() {
     return new Promise((resolve, reject) => {
-      loggerApi.post(`${this.URL_BASE}/info`, this.log)
-        .then(() => {
-          resolve();
+      loggerApi.post(`/info`, this.log, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Basic ${AuthService.getUserToken()}`
+        }
+      })
+        .then((res) => {
+          this.log = {};
+          resolve(res.data.sucesso);
         })
         .catch((e) => reject(e));
     });
@@ -57,9 +72,12 @@ class Logger {
 
   http() {
     return new Promise((resolve, reject) => {
-      loggerApi.post(`${this.URL_BASE}/http`, this.log)
-        .then(() => {
-          resolve();
+      loggerApi.post(`/http`, this.log, {
+        auth: AuthService.getUserToken(),
+      })
+        .then((res) => {
+          this.log = {};
+          resolve(res.data.sucesso);
         })
         .catch((e) => reject(e));
     });
@@ -67,9 +85,12 @@ class Logger {
 
   debbug() {
     return new Promise((resolve, reject) => {
-      loggerApi.post(`${this.URL_BASE}/debbug`, this.log)
-        .then(() => {
-          resolve();
+      loggerApi.post(`/debbug`, this.log, {
+        auth: AuthService.getUserToken(),
+      })
+        .then((res) => {
+          this.log = {};
+          resolve(res.data.sucesso);
         })
         .catch((e) => reject(e));
     });

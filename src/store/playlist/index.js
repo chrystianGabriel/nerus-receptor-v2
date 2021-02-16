@@ -1,6 +1,5 @@
 import database from '../../providers/database';
 import arquivos from '../../providers/arquivos';
-import logger from '../../services/loggerService';
 
 const mutations = {
   adicioneInfoPlaylist(state, {
@@ -21,7 +20,7 @@ const mutations = {
   avanceParaAProximaMusica(state) {
     state.musicaAtual += 1;
   },
-  avanceParaAProximoAudio(state) {
+  avanceParaOProximoAudio(state) {
     state.audioAtual += 1;
   },
   retorneParaOInicio(state) {
@@ -39,7 +38,7 @@ const getters = {
   },
   obtenhaProximoAudio(state) {
     const audio = state.audios[state.audioAtual];
-    mutations.avanceParaAProximoAudio();
+    mutations.avanceParaOProximoAudio();
 
     return audio;
   },
@@ -60,7 +59,6 @@ const actions = {
       context.commit('adicioneInfoPlaylist', playlist);
     });
     database.obtenhaAudiosPlaylist(codigo).then((audios) => {
-      console.log(logger);
       audios.forEach(async (audio) => {
         await arquivos.downloadArquivo('audios', audio.path);
       });

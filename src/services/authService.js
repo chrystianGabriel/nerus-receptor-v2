@@ -1,17 +1,16 @@
-import ErrorException from '../Utils/errorException';
-
 class AuthService {
   constructor() {
-    this.playlistCode = '';
+    this.playlistCode = '3282703';
+  }
+
+  auth(codigo) {
+    this.playlistCode = codigo;
   }
 
   getUserToken() {
-    if (this.playlistCode === '') throw new ErrorException(5, this.getUserToken.toString(), [], 'Não foi cadastrado o codigo da playlist');
+    if (this.playlistCode === '') throw new Error('Não foi cadastrado o codigo da playlist');
 
-    return {
-      username: this.playlistCode,
-      password: this.playlistCode,
-    };
+    return btoa(`${this.playlistCode}:${this.playlistCode}`);
   }
 }
 
