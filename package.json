@@ -13,8 +13,10 @@
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
     "core-js": "^3.6.5",
+    "dayjs": "^1.10.4",
     "dropbox": "^9.0.0",
     "firebase": "^8.2.5",
+    "node-schedule": "^2.0.0",
     "quasar": "^1.0.0",
     "vue-i18n": "^8.0.0",
     "vuesax": "^4.0.1-alpha.25"

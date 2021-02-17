@@ -6,6 +6,7 @@
 <script>
 import { mapActions } from 'vuex';
 import AuthService from './services/authService';
+import TimerManager from './services/TimerManagerSerice';
 
 export default {
   name: 'App',
@@ -13,6 +14,7 @@ export default {
     const codigo = '3282703';
     AuthService.auth(codigo);
     this.carreguePlaylist(codigo);
+    PlaylistManager.Playlist();
   },
   methods: {
     ...mapActions({ carreguePlaylist: 'playlist/carreguePlaylist' }),

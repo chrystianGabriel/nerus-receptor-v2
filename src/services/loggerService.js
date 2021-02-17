@@ -31,7 +31,10 @@ class Logger {
   error() {
     return new Promise((resolve, reject) => {
       loggerApi.post('/error', this.log, {
-        auth: AuthService.getUserToken(),
+        withCredentials: true,
+        headers: {
+          Authorization: `Basic ${AuthService.getUserToken()}`
+        }
       })
         .then((res) => {
           this.log = {};
@@ -44,7 +47,10 @@ class Logger {
   warn() {
     return new Promise((resolve, reject) => {
       loggerApi.post(`/warn`, this.log, {
-        auth: AuthService.getUserToken(),
+        withCredentials: true,
+        headers: {
+          Authorization: `Basic ${AuthService.getUserToken()}`
+        }
       })
         .then((res) => {
           this.log = {};
@@ -73,7 +79,10 @@ class Logger {
   http() {
     return new Promise((resolve, reject) => {
       loggerApi.post(`/http`, this.log, {
-        auth: AuthService.getUserToken(),
+        withCredentials: true,
+        headers: {
+          Authorization: `Basic ${AuthService.getUserToken()}`
+        }
       })
         .then((res) => {
           this.log = {};
@@ -86,7 +95,10 @@ class Logger {
   debbug() {
     return new Promise((resolve, reject) => {
       loggerApi.post(`/debbug`, this.log, {
-        auth: AuthService.getUserToken(),
+        withCredentials: true,
+        headers: {
+          Authorization: `Basic ${AuthService.getUserToken()}`
+        }
       })
         .then((res) => {
           this.log = {};

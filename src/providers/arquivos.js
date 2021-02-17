@@ -47,7 +47,7 @@ class ArquivosProvider {
                     this.dropbox.sharingGetSharedLinkFile({url: data.result.links[0].url})
                     .then(data => {
                         const arquivo = data.result;
-
+                        console.log(data);
                         Logger.classe(ref.constructor.name)
                               .metodo('downloadArquivo')
                               .parametros([diretorio, url])
