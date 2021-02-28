@@ -11,6 +11,15 @@ const mutations = {
     state.tempo = tempo;
     state.tocando = tocando;
   },
+  adicioneUidPlaylist(state, uiid) {
+    state.uid = uiid;
+  },
+  adicioneUidAudios(state, uiid) {
+    state.uidAudios = uiid;
+  },
+  adicioneUidMusicas(state, uiid) {
+    state.uidMusicas = uiid;
+  },
   adicioneAudiosAPlaylist(state, audios) {
     state.audios = audios;
   },
@@ -18,10 +27,10 @@ const mutations = {
     state.musicas = musicas;
   },
   avanceParaAProximaMusica(state) {
-    state.musicaAtual += 1;
+    state.musicaAtual = (state.musicaAtual + 1) % state.musicas.length;
   },
   avanceParaOProximoAudio(state) {
-    state.audioAtual += 1;
+    state.audioAtual = (state.audioAtual + 1) % state.audios.length;
   },
   retorneParaOInicio(state) {
     state.musicaAtual = 0;
@@ -32,15 +41,17 @@ const mutations = {
 const getters = {
   obtenhaProximaMusica(state) {
     const musica = state.musicas[state.musicaAtual];
-    mutations.avanceParaAProximaMusica();
-
     return musica;
   },
   obtenhaProximoAudio(state) {
     const audio = state.audios[state.audioAtual];
-    mutations.avanceParaOProximoAudio();
-
     return audio;
+  },
+  obtenhaAudioAtual(state) {
+    return state.audioAtual - 1;
+  },
+  obtenhaMusicaAtual(state) {
+    return state.musicaAtual - 1;
   },
   obtenhaInfoPlaylist(state) {
     return {
@@ -49,33 +60,112 @@ const getters = {
       nome: state.nome,
       tempo: state.tempo,
       tocando: state.tocando,
+      intervaloMusicaInicial: state.musicas[0].intervalo,
+      intervaloAudioInicial: state.audios[0].intervalo,
+      uid: state.uid,
+      uidAudios: state.uidAudios,
+      uidMusicas: state.uidMusicas,
     };
   },
 };
 
 const actions = {
-  carreguePlaylist(context, codigo) {
-    database.obtenhaInfoPlaylist(codigo).then((playlist) => {
-      context.commit('adicioneInfoPlaylist', playlist);
+  carregueAudios(context, codigo) {
+    return new Promise((resolve, reject) => {
+      database.obtenhaAudiosPlaylist(codigo).then((audios) => {
+        context.commit('adicioneUidAudios', audios[0]);
+        const promises = audios[1].map(async (audio) => {
+          const local = await arquivos.downloadArquivo('audios', audio.path);
+          return {
+            ...audio,
+            local,
+          };
+        });
+        Promise.allSettled(promises).then((a) => {
+          const audiosComSucesso = a.filter((f) => f.value !== undefined).map((v) => v.value);
+          context.commit('adicioneAudiosAPlaylist', audiosComSucesso);
+          resolve();
+        })
+          .catch((e) => {
+            reject(e);
+          });
+      });
     });
-    database.obtenhaAudiosPlaylist(codigo).then((audios) => {
-      audios.forEach(async (audio) => {
-        await arquivos.downloadArquivo('audios', audio.path);
+  },
+  carregueMusicas(context, codigo) {
+    return new Promise((resolve, reject) => {
+      database.obtenhaMusicasPlaylist(codigo).then((musicas) => {
+        context.commit('adicioneUidMusicas', musicas[0]);
+        const promises = musicas[1].map(async (musica) => {
+          const local = await arquivos.downloadArquivo('musicas', musica.path);
+
+          return {
+            ...musica,
+            local,
+          };
+        });
+
+        Promise.allSettled(promises).then((m) => {
+          const musicasComSucesso = m.filter((f) => f.value !== undefined).map((v) => v.value);
+          context.commit('adicioneMusicasAPlaylist', musicasComSucesso);
+          resolve();
+        })
+          .catch((e) => {
+            reject(e);
+          });
+      });
+    });
+  },
+  carreguePlaylist(context, codigo) {
+    return new Promise((resolve, reject) => {
+      database.obtenhaInfoPlaylist(codigo).then(async (playlist) => {
+        context.commit('adicioneUidPlaylist', playlist[0]);
+        context.commit('adicioneInfoPlaylist', playlist[1]);
+        await actions.carregueAudios(context, codigo).catch((e) => reject(e));
+        await actions.carregueMusicas(context, codigo).catch((e) => reject(e));
+
+        resolve();
+      });
+    });
+  },
+  atualizeAudioTocando(context, index) {
+    return new Promise((resolve, reject) => {
+      const audios = context.state.audios.map((valor, i) => {
+        const tocando = index === i;
+        return {
+          ...valor,
+          tocando,
+        };
       });
 
       context.commit('adicioneAudiosAPlaylist', audios);
+      database.atualizeAudio(context.state, audios)
+        .then(() => resolve())
+        .catch((e) => reject(e));
     });
-    database.obtenhaMusicasPlaylist(codigo).then((musicas) => {
-      musicas.forEach(async (musica) => {
-        await arquivos.downloadArquivo('musicas', musica.path);
+  },
+  atualizeMusicaTocando(context, index) {
+    return new Promise((resolve, reject) => {
+      const musicas = context.state.musicas.map((valor, i) => {
+        const tocando = index === i;
+        return {
+          ...valor,
+          tocando,
+        };
       });
       context.commit('adicioneMusicasAPlaylist', musicas);
+      database.atualizeMusica(context.state, musicas)
+        .then(() => resolve())
+        .catch((e) => reject(e));
     });
   },
 };
 
 const state = () => ({
   codigo: '',
+  uid: '',
+  uidAudios: '',
+  uidMusicas: '',
   intervaloDeRepeticao: 0,
   nome: '',
   tempo: '23:00',

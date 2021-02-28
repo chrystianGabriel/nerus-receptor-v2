@@ -10,11 +10,16 @@ class TimerManager {
     addTimer(id, func, time, units) {
         try
         {
+            if(this.timers[id] != undefined)
+            {
+                clearTimeout(this.timers[id].timer);
+            }
+
             this.timers[id] = {};
             this.timers[id].timer = setTimeout(func, this.unitConvert(time, units));
             this.timers[id].func = func;
-            this.timers[id].time = dayJS().add(time, 'minutes', units);
-
+            this.timers[id].time = dayJS().add(time, units);
+            
             Logger.classe(this.constructor.name)
                 .metodo('addTimer')
                 .mensagem(`Adicionado Timer: ${id}`)
@@ -26,8 +31,46 @@ class TimerManager {
                 .metodo('addTimer')
                 .mensagem(e.message)
                 .parametros([id, func, time, units])
-                .info();
+                .error();
         }
+    }
+
+    addTimerLoop(id, func, cond, time, units) {
+        return new Promise((resolve, reject) => {
+            try
+            {
+                if(this.timers[id] != undefined)
+                {
+                    clearTimeout(this.timers[id].timer);
+                }
+                
+                if(cond()) {
+                    this.timers[id] = {};
+                    this.timers[id].timer = setTimeout(() => {
+                        func();
+                        this.addTimerLoop(id, func, cond, time, units);
+                    }, this.unitConvert(time, units));
+                    this.timers[id].func = func;
+                    this.timers[id].time = dayJS().add(time, units);
+                }
+                else {
+                    Logger.classe(this.constructor.name)
+                        .metodo('addTimerLoop')
+                        .mensagem(`Adicionado Timer: ${id}`)
+                        .parametros([id, func, time, units])
+                        .info();
+                    resolve();
+                }
+            }
+            catch(e) {
+                Logger.classe(this.constructor.name)
+                    .metodo('addTimer')
+                    .mensagem(e.message)
+                    .parametros([id, func, time, units])
+                    .error();
+                reject(e);
+            }
+        })
     }
 
     removeTimer(id) {
@@ -47,7 +90,7 @@ class TimerManager {
                 .metodo('removeTimer')
                 .mensagem(e.message)
                 .parametros([id, func, time, units])
-                .info();
+                .error();
         }
     }
 
@@ -83,5 +126,5 @@ class TimerManager {
         return time;
     }
 }
-
+ 
 export default new TimerManager();

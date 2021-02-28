@@ -47,7 +47,6 @@ class ArquivosProvider {
                     this.dropbox.sharingGetSharedLinkFile({url: data.result.links[0].url})
                     .then(data => {
                         const arquivo = data.result;
-                        console.log(data);
                         Logger.classe(ref.constructor.name)
                               .metodo('downloadArquivo')
                               .parametros([diretorio, url])
@@ -72,20 +71,19 @@ class ArquivosProvider {
                                     .mensagem(e.message)
                                     .error();
                                 };
-
                                 fileWriter.write(arquivo.fileBlob);
-
-                                resolve();
+                                resolve(fileWriter.localURL);
                                 })
                             }, (e) => reject(e));
-                        })
+                        }).catch((e) => reject(e))
                  })
                  .catch(e => {
                     Logger.classe(ref.constructor.name)
                           .metodo('downloadArquivo')
                           .parametros([diretorio, url])
                           .mensagem(e.message)
-                          .info();
+                          .error();
+                    reject(e);
                  })
             });
        })

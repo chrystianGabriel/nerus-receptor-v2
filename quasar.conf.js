@@ -24,6 +24,7 @@ module.exports = function (/* ctx */) {
       'i18n',
       'axios',
       'vuesax',
+      'media',
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -50,8 +51,8 @@ module.exports = function (/* ctx */) {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       env: {
         LOGGER_URL: process.env.DEV
-          ? 'http://192.168.0.186:8081/api/v1/logs'
-          : 'http://192.168.0.186:8081/api/v1/logs',
+          ? 'https://3553aeda113e.ngrok.io/api/v1/logs'
+          : 'https://3553aeda113e.ngrok.io/api/v1/logs',
       },
       // transpile: false,
 
@@ -160,7 +161,7 @@ module.exports = function (/* ctx */) {
       },
     },
     bin: {
-      linuxAndroidStudio: '/home/chrystian/Downloads/android-studio/bin/studio.sh',
+      linuxAndroidStudio: '/home/chrystian/Downloads/android-studio-ide-201.7042882-linux/android-studio/bin/studio.sh',
     },
     // Full list of options: https://quasar.dev/quasar-cli/developing-cordova-apps/configuring-cordova
     cordova: {

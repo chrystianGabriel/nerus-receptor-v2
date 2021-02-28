@@ -45,8 +45,8 @@ class DataBase {
               .metodo('obtenhaInfoPlaylist')
               .mensagem('Obtido informações da playlist')
               .info();
-        
-        resolve(data.val()[Object.keys(data.val())[0]]);
+        const uuid = Object.keys(data.val())[0];
+        resolve([uuid, data.val()[uuid]]);
       })
       .catch((e) => {
 
@@ -71,7 +71,8 @@ class DataBase {
               .mensagem('Obtido audios da playlist')
               .info();
 
-        resolve(data.val()[Object.keys(data.val())[0]]);
+        const uuid = Object.keys(data.val())[0];
+        resolve([uuid, data.val()[uuid]]);
       })
       .catch((e) => {
         Logger.classe(this.constructor.name)
@@ -95,7 +96,8 @@ class DataBase {
               .mensagem('Obtido musicas da playlist')
               .info();
       
-        resolve(data.val()[Object.keys(data.val())[0]]);
+        const uuid = Object.keys(data.val())[0];
+        resolve([uuid, data.val()[uuid]]);
       })
       .catch((e) => {
 
@@ -107,6 +109,39 @@ class DataBase {
         reject(e)
       });
     });
+  }
+
+  observeSePlaylistEstaTocando(codigo) {
+    return new Promise((resolve, reject) => {
+      this.database.ref(`/play_lists/${codigo}`).on('child_changed', (data) => {
+        resolve(data.val());
+      })
+    })
+  }
+
+  observeSeAudiosForamAdicionados(codigo) {
+    return new Promise((resolve, reject) => {
+      this.database.ref(`/audios/${codigo}`).on('child_changed', (data) => {
+        resolve(data.val());
+      })
+    })
+  }
+
+  observeSeMusicasForamAdicionadas(codigo) {
+    return new Promise((resolve, reject) => {
+      this.database.ref(`/musicas/${codigo}`).on('child_changed', (data) => {
+        resolve(data.val());
+      })
+    })
+  }
+
+  atualizeMusica(playlist, musicas) {
+    return new Promise((resolve, reject) => {
+      this.database.ref(`/musicas/${playlist.codigo}/${playlist.uidMusicas}/`).update(musicas).then(() => {
+        resolve();
+      })
+      .catch(e => reject(e));
+    })
   }
 }
 

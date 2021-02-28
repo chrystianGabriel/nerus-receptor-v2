@@ -62,17 +62,21 @@ class Logger {
 
   info() {
     return new Promise((resolve, reject) => {
-      loggerApi.post(`/info`, this.log, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Basic ${AuthService.getUserToken()}`
-        }
-      })
-        .then((res) => {
-          this.log = {};
-          resolve(res.data.sucesso);
+      if(process.env.DEV) {
+        loggerApi.post(`/info`, this.log, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Basic ${AuthService.getUserToken()}`
+          }
         })
-        .catch((e) => reject(e));
+          .then((res) => {
+            this.log = {};
+            resolve(res.data.sucesso);
+          })
+          .catch((e) => reject(e));
+      }
+
+      resolve(true);
     });
   }
 
