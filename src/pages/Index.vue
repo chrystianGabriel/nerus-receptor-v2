@@ -22,10 +22,10 @@
               style="margin-left: 10px"
               @click="buscarCodigoPlaylist" />
         </vs-col>
-        <audio ref="playerMusica" controls>
+        <audio ref="playerMusica" style="display:none" autobuffer="autobuffer" controls>
           <source :src="musica">
         </audio>
-        <audio ref="playerAudio" controls>
+        <audio ref="playerAudio" style="display:none" autobuffer="autobuffer" controls>
           <source :src="audio">
         </audio>
     </vs-row>

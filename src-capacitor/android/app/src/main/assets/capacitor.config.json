@@ -1,0 +1,10 @@
+{
+  "appId": "app.nerus.receptor.v2",
+  "appName": "Nerus Receptor",
+  "bundledWebRuntime": false,
+  "npmClient": "yarn",
+  "webDir": "www",
+  "server": {
+    "url": "http://192.168.0.186:8080"
+  }
+}

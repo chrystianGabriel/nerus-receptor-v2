@@ -24,7 +24,7 @@ module.exports = function (/* ctx */) {
       'i18n',
       'axios',
       'vuesax',
-      'media',
+      'background',
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -51,8 +51,8 @@ module.exports = function (/* ctx */) {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       env: {
         LOGGER_URL: process.env.DEV
-          ? 'https://3553aeda113e.ngrok.io/api/v1/logs'
-          : 'https://3553aeda113e.ngrok.io/api/v1/logs',
+          ? 'https://039cace53e4a.ngrok.io/api/v1/logs'
+          : 'https://039cace53e4a.ngrok.io/api/v1/logs',
       },
       // transpile: false,
 

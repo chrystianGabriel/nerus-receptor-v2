@@ -15,8 +15,10 @@
     ]
   },
   "dependencies": {
+    "@capacitor/core": "^2.4.6",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
+    "capacitor-blob-writer": "^0.1.11",
     "core-js": "^3.6.5",
     "dayjs": "^1.10.4",
     "dropbox": "^9.0.0",
