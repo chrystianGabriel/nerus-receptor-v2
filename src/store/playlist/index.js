@@ -65,6 +65,8 @@ const getters = {
       uid: state.uid,
       uidAudios: state.uidAudios,
       uidMusicas: state.uidMusicas,
+      audios: state.audios,
+      musicas: state.musicas,
     };
   },
 };

@@ -5,7 +5,8 @@
       vs-type="flex"
       vs-justify="center"
       vs-w="12"
-      style="height:100vh">
+      style="height:100vh"
+      v-if="!playlistCarregada">
         <vs-col
           vs-type="flex"
           vs-justify="center"
@@ -22,12 +23,78 @@
               style="margin-left: 10px"
               @click="buscarCodigoPlaylist" />
         </vs-col>
-        <audio ref="playerMusica" style="display:none" autobuffer="autobuffer" controls>
-          <source :src="musica">
-        </audio>
-        <audio ref="playerAudio" style="display:none" autobuffer="autobuffer" controls>
-          <source :src="audio">
-        </audio>
+    </vs-row>
+    <vs-row v-if="playlistCarregada">
+      <vs-col>
+        <vs-tabs>
+          <vs-tab label="Musicas">
+            <vs-table  max-items="10" pagination :data="this.playlist.musicas">
+              <template slot="header">
+                <h3>
+                  Musicas
+                </h3>
+              </template>
+              <template slot="thead">
+                  <vs-th>
+                    Nome
+                  </vs-th>
+                  <vs-th>
+                    Tocando
+                  </vs-th>
+              </template>
+              <template slot-scope="{data}">
+                <vs-tr :state="data[indextr].tocando == true? 'success': ''"
+                :key="indextr" v-for="(tr, indextr) in data" >
+                  <vs-td :data="data[indextr].nome">
+                    {{data[indextr].nome}}
+                  </vs-td>
+
+                  <vs-td :data="data[indextr].tocando">
+                    <p v-if="data[indextr].tocando">Sim</p>
+                    <p v-else>Não</p>
+                  </vs-td>
+                </vs-tr>
+              </template>
+            </vs-table>
+          </vs-tab>
+          <vs-tab label="Audios">
+            <vs-table  max-items="10" pagination :data="this.playlist.audios">
+              <template slot="header">
+                <h3>
+                  Musicas
+                </h3>
+              </template>
+              <template slot="thead">
+                  <vs-th>
+                    Nome
+                  </vs-th>
+                  <vs-th>
+                    Tocando
+                  </vs-th>
+              </template>
+              <template slot-scope="{data}">
+                <vs-tr :state="data[indextr].tocando == true? 'success': ''"
+                :key="indextr" v-for="(tr, indextr) in data" >
+                  <vs-td :data="data[indextr].nome">
+                    {{data[indextr].nome}}
+                  </vs-td>
+
+                  <vs-td :data="data[indextr].tocando">
+                    <p v-if="data[indextr].tocando">Sim</p>
+                    <p v-else>Não</p>
+                  </vs-td>
+                </vs-tr>
+              </template>
+            </vs-table>
+          </vs-tab>
+        </vs-tabs>
+      </vs-col>
+      <audio ref="playerMusica" style="display:none" autobuffer="autobuffer" controls>
+        <source :src="musica">
+      </audio>
+      <audio ref="playerAudio" style="display:none" autobuffer="autobuffer" controls>
+        <source :src="audio">
+      </audio>
     </vs-row>
   </div>
 </template>
@@ -43,9 +110,10 @@ export default {
   name: 'PageIndex',
   data() {
     return {
-      codigo: '',
+      codigo: '3282703',
       musicaAtual: '',
       audioAtual: '',
+      playlistCarregada: false,
     };
   },
   computed: {
@@ -97,6 +165,7 @@ export default {
     iniciarExecucao() {
       timerManager.addTimer(`INIT_PLAYLIST_MUSICAS: ${this.playlist.nome}`, () => this.executarMusica(), this.playlist.intervaloMusicaInicial, 'seconds');
       timerManager.addTimer(`INIT_PLAYLIST_AUDIOS: ${this.playlist.nome}`, () => this.executarAudio(), this.playlist.intervaloMusicaInicial + this.playlist.intervaloAudioInicial, 'seconds');
+      this.playlistCarregada = true;
       this.observeSePlaylistEstaTocando();
       this.observeSeAudiosForamAdicionados();
       this.observeSeMusicasForamAdicionadas();
@@ -118,7 +187,6 @@ export default {
         this.fadOutMusica();
         this.$refs.playerAudio.load();
         this.$refs.playerAudio.play().then(() => {
-          this.$refs.playerAudio.playbackRate = 2;
           Logger.classe('App')
             .metodo('executarAudio')
             .mensagem(`Audio Iniciado: ${audio.nome}`)
@@ -143,7 +211,6 @@ export default {
         this.musica = musica.local;
         this.$refs.playerMusica.load();
         this.$refs.playerMusica.play().then(() => {
-          this.$refs.playerMusica.playbackRate = 2;
           this.atualizeMusicaTocando(this.obtenhaMusicaAtual());
           Logger.classe('App')
             .metodo('executarMusica')
@@ -175,27 +242,27 @@ export default {
       timerManager.addTimerLoop('TIMER_FADE_IN_MUSICA', func, cond, 5);
     },
     observeSePlaylistEstaTocando() {
-      database.observeSePlaylistEstaTocando('3282703').then((playlist) => {
+      database.observeSePlaylistEstaTocando(this.codigo).then((playlist) => {
         this.$store.commit('playlist/adicioneInfoPlaylist', playlist);
         this.observeSePlaylistEstaTocando();
       });
     },
     observeSeAudiosForamAdicionados() {
-      database.observeSeAudiosForamAdicionados('3282703').then((audios) => {
+      database.observeSeAudiosForamAdicionados(this.codigo).then((audios) => {
         this.$store.commit('playlist/adicioneAudiosAPlaylist', audios);
         this.observeSeAudiosForamAdicionados();
       });
     },
     observeSeMusicasForamAdicionadas() {
-      database.observeSeMusicasForamAdicionadas('3282703').then((musicas) => {
+      database.observeSeMusicasForamAdicionadas(this.codigo).then((musicas) => {
         this.$store.commit('playlist/adicioneMusicasAPlaylist', musicas);
         this.observeSeMusicasForamAdicionadas();
       });
     },
     buscarCodigoPlaylist() {
-      AuthService.auth('3282703');
+      AuthService.auth(this.codigo);
       this.$vs.loading();
-      this.carreguePlaylist('3282703').then(() => {
+      this.carreguePlaylist(this.codigo).then(() => {
         this.$vs.loading.close();
         this.iniciarExecucao();
         Logger.classe('App')
